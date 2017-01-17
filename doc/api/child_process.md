@@ -137,7 +137,7 @@ added: v0.1.90
   * `timeout` {Number} (Default: `0`)
   * [`maxBuffer`][] {Number} largest amount of data (in bytes) allowed on
     stdout or stderr - if exceeded child process is killed (Default: `200*1024`)
-  * `killSignal` {String} (Default: `'SIGTERM'`)
+  * `killSignal` {String|Integer} (Default: `'SIGTERM'`)
   * `uid` {Number} Sets the user identity of the process. (See setuid(2).)
   * `gid` {Number} Sets the group identity of the process. (See setgid(2).)
 * `callback` {Function} called with the output when process terminates
@@ -148,6 +148,10 @@ added: v0.1.90
 
 Spawns a shell then executes the `command` within that shell, buffering any
 generated output.
+
+**Note: Never pass unsanitised user input to this function. Any input
+containing shell metacharacters may be used to trigger arbitrary command
+execution.**
 
 ```js
 const exec = require('child_process').exec;
@@ -210,7 +214,7 @@ added: v0.1.91
   * `timeout` {Number} (Default: `0`)
   * [`maxBuffer`][] {Number} largest amount of data (in bytes) allowed on
     stdout or stderr - if exceeded child process is killed (Default: `200*1024`)
-  * `killSignal` {String} (Default: `'SIGTERM'`)
+  * `killSignal` {String|Integer} (Default: `'SIGTERM'`)
   * `uid` {Number} Sets the user identity of the process. (See setuid(2).)
   * `gid` {Number} Sets the group identity of the process. (See setgid(2).)
 * `callback` {Function} called with the output when process terminates
@@ -323,6 +327,10 @@ added: v0.1.90
 The `child_process.spawn()` method spawns a new process using the given
 `command`, with command line arguments in `args`. If omitted, `args` defaults
 to an empty array.
+
+**Note: If the `shell` option is enabled, do not pass unsanitised user input to
+this function. Any input containing shell metacharacters may be used to
+trigger arbitrary command execution.**
 
 A third argument may be used to specify additional options, with these defaults:
 
@@ -572,8 +580,8 @@ added: v0.11.12
 * `args` {Array} List of string arguments
 * `options` {Object}
   * `cwd` {String} Current working directory of the child process
-  * `input` {String|Buffer} The value which will be passed as stdin to the
-    spawned process
+  * `input` {String|Buffer|Uint8Array} The value which will be passed as stdin
+    to the spawned process
     - supplying this value will override `stdio[0]`
   * `stdio` {String | Array} Child's stdio configuration. (Default: `'pipe'`)
     - `stderr` by default will be output to the parent process' stderr unless
@@ -583,8 +591,8 @@ added: v0.11.12
   * `gid` {Number} Sets the group identity of the process. (See setgid(2).)
   * `timeout` {Number} In milliseconds the maximum amount of time the process
     is allowed to run. (Default: `undefined`)
-  * `killSignal` {String} The signal value to be used when the spawned process
-    will be killed. (Default: `'SIGTERM'`)
+  * `killSignal` {String|Integer} The signal value to be used when the spawned
+    process will be killed. (Default: `'SIGTERM'`)
   * [`maxBuffer`][] {Number} largest amount of data (in bytes) allowed on
     stdout or stderr - if exceeded child process is killed
   * `encoding` {String} The encoding used for all stdio inputs and outputs. (Default: `'buffer'`)
@@ -610,8 +618,8 @@ added: v0.11.12
 * `command` {String} The command to run
 * `options` {Object}
   * `cwd` {String} Current working directory of the child process
-  * `input` {String|Buffer} The value which will be passed as stdin to the
-    spawned process
+  * `input` {String|Buffer|Uint8Array} The value which will be passed as stdin
+    to the spawned process
     - supplying this value will override `stdio[0]`
   * `stdio` {String | Array} Child's stdio configuration. (Default: `'pipe'`)
     - `stderr` by default will be output to the parent process' stderr unless
@@ -625,8 +633,8 @@ added: v0.11.12
   * `gid` {Number} Sets the group identity of the process. (See setgid(2).)
   * `timeout` {Number} In milliseconds the maximum amount of time the process
     is allowed to run. (Default: `undefined`)
-  * `killSignal` {String} The signal value to be used when the spawned process
-    will be killed. (Default: `'SIGTERM'`)
+  * `killSignal` {String|Integer} The signal value to be used when the spawned
+    process will be killed. (Default: `'SIGTERM'`)
   * [`maxBuffer`][] {Number} largest amount of data (in bytes) allowed on
     stdout or stderr - if exceeded child process is killed
   * `encoding` {String} The encoding used for all stdio inputs and outputs.
@@ -645,6 +653,10 @@ If the process times out, or has a non-zero exit code, this method ***will***
 throw.  The [`Error`][] object will contain the entire result from
 [`child_process.spawnSync()`][]
 
+**Note: Never pass unsanitised user input to this function. Any input
+containing shell metacharacters may be used to trigger arbitrary command
+execution.**
+
 ### child_process.spawnSync(command[, args][, options])
 <!-- YAML
 added: v0.11.12
@@ -654,8 +666,8 @@ added: v0.11.12
 * `args` {Array} List of string arguments
 * `options` {Object}
   * `cwd` {String} Current working directory of the child process
-  * `input` {String|Buffer} The value which will be passed as stdin to the
-    spawned process
+  * `input` {String|Buffer|Uint8Array} The value which will be passed as stdin
+    to the spawned process
     - supplying this value will override `stdio[0]`
   * `stdio` {String | Array} Child's stdio configuration.
   * `env` {Object} Environment key-value pairs
@@ -663,8 +675,8 @@ added: v0.11.12
   * `gid` {Number} Sets the group identity of the process. (See setgid(2).)
   * `timeout` {Number} In milliseconds the maximum amount of time the process
     is allowed to run. (Default: `undefined`)
-  * `killSignal` {String} The signal value to be used when the spawned process
-    will be killed. (Default: `'SIGTERM'`)
+  * `killSignal` {String|Integer} The signal value to be used when the spawned
+    process will be killed. (Default: `'SIGTERM'`)
   * [`maxBuffer`][] {Number} largest amount of data (in bytes) allowed on
     stdout or stderr - if exceeded child process is killed
   * `encoding` {String} The encoding used for all stdio inputs and outputs.
@@ -689,6 +701,10 @@ and `killSignal` is sent, the method won't return until the process has
 completely exited. Note that if the process intercepts and handles the
 `SIGTERM` signal and doesn't exit, the parent process will wait until the child
 process has exited.
+
+**Note: If the `shell` option is enabled, do not pass unsanitised user input to
+this function. Any input containing shell metacharacters may be used to
+trigger arbitrary command execution.**
 
 ## Class: ChildProcess
 <!-- YAML
